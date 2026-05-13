@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tu Potencial Natural | GM Team</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #E8001D;
+      --red-dark: #B0001A;
+      --red-glow: rgba(232,0,29,0.35);
+      --black: #080808;
+      --card: #131313;
+      --card2: #1c1c1c;
+      --border: #282828;
+      --text: #ffffff;
+      --muted: #777777;
+      --muted2: #444444;
+      --green: #00C851;
+      --orange: #FF8C00;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html { height: 100%; background: var(--black); }
+
+    body {
+      min-height: 100%;
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Barlow', 'Arial', 'Helvetica Neue', sans-serif;
+      overflow-x: hidden;
+    }
+
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-container {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: 3px;
+      background: #1a1a1a;
+      z-index: 200;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red-dark), var(--red));
+      transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 10px var(--red-glow);
+      width: 0%;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 60px 24px 48px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .screen.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+      position: relative;
+    }
+    .screen.exit-left {
+      opacity: 0;
+      transform: translateX(-80px);
+    }
+
+    /* ── INTRO ── */
+    .intro-screen {
+      background: radial-gradient(ellipse at 50% 0%, #200000 0%, #0d0000 40%, var(--black) 70%);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding-top: 50px;
+      min-height: 100vh;
+    }
+    .intro-badge {
+      display: inline-block;
+      background: var(--red);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 2px;
+      margin-bottom: 28px;
+    }
+    .intro-title {
+      font-family: 'Barlow Condensed', 'Arial Black', Impact, sans-serif;
+      font-size: 60px;
+      font-weight: 900;
+      line-height: 0.88;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .intro-title .red { color: var(--red); }
+    .intro-divider {
+      width: 50px;
+      height: 3px;
+      background: var(--red);
+      margin: 0 auto 20px;
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+    .intro-subtitle {
+      font-size: 15px;
+      color: #999;
+      line-height: 1.65;
+      margin-bottom: 44px;
+      max-width: 300px;
+    }
+    .intro-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+      letter-spacing: 1px;
+    }
+    .intro-meta span { margin: 0 6px; }
+    .intro-meta span::before { content: '·'; margin-right: 12px; }
+    .intro-meta span:first-child::before { display: none; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', 'Arial Black', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 6px 24px var(--red-glow);
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 10px var(--red-glow); }
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      animation: shimmer 2.5s infinite;
+    }
+
+    .btn-next {
+      flex: 1;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 16px var(--red-glow);
+      transition: transform 0.15s;
+    }
+    .btn-next:active { transform: scale(0.97); }
+    .btn-next:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-back {
+      width: 52px;
+      height: 52px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+    .btn-back:hover { border-color: var(--red); }
+
+    /* ── QUESTION ANATOMY ── */
+    .q-step {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 10px;
+    }
+    .q-title {
+      font-family: 'Barlow Condensed', 'Arial Black', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.05;
+      margin-bottom: 6px;
+    }
+    .q-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.55;
+    }
+    .q-content { flex: 1; }
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    /* ── OPTION BUTTONS ── */
+    .options-list { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 15px 18px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .option-btn:hover { border-color: #444; }
+    .option-btn.selected {
+      border-color: var(--red);
+      background: rgba(232,0,29,0.08);
+      box-shadow: 0 0 0 1px var(--red) inset;
+    }
+    .option-icon { font-size: 22px; min-width: 28px; text-align: center; }
+    .option-text { flex: 1; }
+    .option-title { font-weight: 700; font-size: 16px; margin-bottom: 1px; }
+    .option-desc { font-size: 12px; color: var(--muted); }
+    .option-radio {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .option-btn.selected .option-radio {
+      background: var(--red);
+      border-color: var(--red);
+    }
+    .option-btn.selected .option-radio::after {
+      content: '';
+      width: 7px; height: 7px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* ── NUMBER PICKER ── */
+    .num-picker {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .num-btn {
+      width: 56px; height: 56px;
+      background: var(--card2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 26px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+    .num-btn:active { background: var(--red); border-color: var(--red); }
+    .num-display { flex: 1; text-align: center; }
+    .num-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 68px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+    .num-unit {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+    .num-hint {
+      font-size: 13px;
+      color: var(--muted2);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ── BODY FAT VISUAL GUIDE ── */
+    .bf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .bf-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 6px 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      text-align: center;
+    }
+    .bf-card:hover { border-color: #444; }
+    .bf-card.selected {
+      border-color: var(--red);
+      background: rgba(232,0,29,0.08);
+      box-shadow: 0 0 0 1px var(--red) inset;
+    }
+    .bf-svg-wrap {
+      width: 100%;
+      aspect-ratio: 3/4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+    .bf-svg-wrap svg { width: 100%; height: 100%; }
+    .bf-pct {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px;
+      font-weight: 900;
+    }
+    .bf-card.selected .bf-pct { color: var(--red); }
+    .bf-desc {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    /* ── STRENGTH INPUTS ── */
+    .strength-list { display: flex; flex-direction: column; gap: 10px; }
+    .strength-row {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .strength-name {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .s-icon { font-size: 16px; }
+    .strength-inputs-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .s-input-wrap label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .s-input-wrap input {
+      width: 100%;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Barlow Condensed', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .s-input-wrap input:focus { border-color: var(--red); }
+    .s-input-wrap input::placeholder { color: var(--muted2); font-size: 16px; }
+
+    /* ── MEASUREMENTS ── */
+    .measure-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .measure-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+    .measure-card:focus-within { border-color: var(--red); }
+    .measure-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+    .measure-inner { display: flex; align-items: baseline; gap: 4px; }
+    .measure-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 32px;
+      font-weight: 900;
+      font-family: 'Barlow Condensed', sans-serif;
+      outline: none;
+    }
+    .measure-input::placeholder { color: var(--muted2); }
+    .measure-unit { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+    /* ── OPTIONAL BADGE ── */
+    .optional-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.07);
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .skip-row {
+      text-align: center;
+      margin-top: 14px;
+    }
+    .skip-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 8px;
+    }
+
+    /* ── RESULTS ── */
+    .results-screen {
+      background: radial-gradient(ellipse at 50% 0%, #1a0000 0%, #0d0000 30%, var(--black) 60%);
+      padding: 50px 22px 70px;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .results-header { margin-bottom: 28px; }
+    .results-hey {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .results-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 44px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.95;
+    }
+    .results-title .red { color: var(--red); }
+
+    /* POTENTIAL MAIN CARD */
+    .potential-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .potential-card.revealed {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .potential-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--red), transparent);
+    }
+    .pot-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .pot-number-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .pot-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 80px;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+    }
+    .pot-number-label {
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .pot-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #222;
+      border-radius: 5px;
+      overflow: visible;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .pot-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red-dark), var(--red));
+      border-radius: 5px;
+      width: 0%;
+      transition: width 1.6s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+    .pot-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted2);
+    }
+    .pot-message {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(232,0,29,0.08);
+      border-left: 3px solid var(--red);
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      color: #ddd;
+      line-height: 1.55;
+    }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    .stat-card.revealed {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stat-lbl {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .stat-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .stat-val .unit { font-size: 14px; color: var(--muted); }
+    .green { color: var(--green); }
+    .orange { color: var(--orange); }
+    .red-text { color: var(--red); }
+
+    /* INSIGHT CARDS */
+    .insight-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    .insight-card.revealed {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .insight-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .insight-icon { font-size: 20px; }
+    .insight-title { font-weight: 800; font-size: 15px; }
+    .insight-body { font-size: 14px; color: #ccc; line-height: 1.6; }
+
+    /* STRENGTH RESULT */
+    .strength-result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .strength-result:last-child { border-bottom: none; }
+    .sr-name { flex: 1; font-size: 14px; font-weight: 700; }
+    .sr-bar-wrap { width: 90px; }
+    .sr-bar-bg { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+    .sr-bar { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+    .sr-level { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+    /* COMPARISON VISUAL */
+    .compare-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 14px;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    .compare-card.revealed {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .compare-col { text-align: center; }
+    .compare-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .compare-unit { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .compare-arrow {
+      font-size: 28px;
+      color: var(--red);
+      font-weight: 900;
+    }
+    .compare-sublabel { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* CTA SECTION */
+    .cta-section {
+      background: linear-gradient(135deg, #B0001A 0%, var(--red) 60%, #FF2233 100%);
+      border-radius: 18px;
+      padding: 28px 24px;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .cta-section.revealed {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .cta-blob1 {
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+    .cta-blob2 {
+      position: absolute;
+      bottom: -50px; left: -30px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.1);
+    }
+    .cta-inner { position: relative; z-index: 1; }
+    .cta-eyebrow {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+    .cta-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.0;
+      margin-bottom: 20px;
+    }
+    .cta-steps { list-style: none; margin-bottom: 24px; }
+    .cta-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .cta-steps li:last-child { border-bottom: none; }
+    .step-num {
+      min-width: 28px; height: 28px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .btn-cta {
+      width: 100%;
+      padding: 18px;
+      background: white;
+      color: var(--red);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .btn-cta:active { transform: scale(0.97); }
+
+    /* TEXT INPUT SCREEN */
+    .text-input-wrap {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .text-input-wrap:focus-within { border-color: var(--red); }
+    .text-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      outline: none;
+    }
+    .text-input::placeholder { color: var(--muted2); }
+
+    /* SCROLL HINT */
+    ::-webkit-scrollbar { width: 0; }
+
+    /* LOADING BAR */
+    .loading-bar-wrap {
+      width: 100%;
+      height: 4px;
+      background: #1a1a1a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .loading-bar {
+      height: 100%;
+      background: var(--red);
+      width: 0%;
+      animation: loadUp 2s ease forwards;
+    }
+    @keyframes loadUp {
+      0% { width: 0%; }
+      30% { width: 40%; }
+      70% { width: 75%; }
+      100% { width: 100%; }
+    }
+
+    /* CALCULATING SCREEN */
+    .calculating-screen {
+      background: var(--black);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 0;
+    }
+    @keyframes rotateRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .calc-ring {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 3px solid #1a1a1a;
+      border-top-color: var(--red);
+      animation: rotateRing 0.9s linear infinite;
+      margin: 0 auto 24px;
+    }
+    .calc-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .calc-subtitle { font-size: 14px; color: var(--muted); }
+
+    /* RESPONSIVE SMALL PHONES */
+    @media (max-width: 360px) {
+      .intro-title { font-size: 48px; }
+      .pot-number { font-size: 64px; }
+      .q-title { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+  <!-- ═══ SCREEN 0: INTRO ═══ -->
+  <div class="screen intro-screen active" id="screen-0">
+    <div class="intro-badge">GM Team · Test Oficial</div>
+    <h1 class="intro-title">
+      DESCUBRE<br>TU <span class="red">LÍMITE</span><br>NATURAL
+    </h1>
+    <div class="intro-divider"></div>
+    <p class="intro-subtitle">
+      El único test basado en ciencia real que calcula exactamente hasta dónde puedes llegar naturalmente, y qué te separa de lograrlo.
+    </p>
+    <button class="btn-primary" onclick="goNext()">COMENZAR AHORA →</button>
+    <div class="intro-meta">
+      <span>2 minutos</span>
+      <span>100% Gratis</span>
+      <span>Sin filtros</span>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 1: NOMBRE ═══ -->
+  <div class="screen" id="screen-1">
+    <div class="q-step">Paso 1 de 10</div>
+    <h2 class="q-title">¿CÓMO TE LLAMAS?</h2>
+    <p class="q-subtitle">Lo usamos para personalizar tus resultados. <em style="color:var(--muted2)">Opcional.</em></p>
+    <div class="q-content">
+      <div class="text-input-wrap">
+        <input type="text" class="text-input" id="input-nombre" placeholder="Tu nombre…" maxlength="30" autocomplete="off">
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" onclick="goNext()">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 2: EDAD ═══ -->
+  <div class="screen" id="screen-2">
+    <div class="q-step">Paso 2 de 10</div>
+    <h2 class="q-title">¿CUÁNTOS<br>AÑOS TIENES?</h2>
+    <p class="q-subtitle">La edad afecta tu velocidad de ganancia y potencial máximo.</p>
+    <div class="q-content">
+      <div class="options-list" id="options-edad">
+        <button class="option-btn" data-val="18" onclick="selectOption('edad','18',this)">
+          <span class="option-icon">⚡</span>
+          <span class="option-text"><span class="option-title">Menos de 20 años</span><span class="option-desc">Todavía en desarrollo · Potencial enorme por delante</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="22" onclick="selectOption('edad','22',this)">
+          <span class="option-icon">🔥</span>
+          <span class="option-text"><span class="option-title">20 – 24 años</span><span class="option-desc">Pico hormonal · Momento ideal para construir base</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="27" onclick="selectOption('edad','27',this)">
+          <span class="option-icon">💪</span>
+          <span class="option-text"><span class="option-title">25 – 29 años</span><span class="option-desc">Madurez muscular · Ganancias sólidas y sostenibles</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="32" onclick="selectOption('edad','32',this)">
+          <span class="option-icon">🎯</span>
+          <span class="option-text"><span class="option-title">30 – 35 años</span><span class="option-desc">Experiencia + hormonal óptimo · Gran combinación</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="40" onclick="selectOption('edad','40',this)">
+          <span class="option-icon">🧠</span>
+          <span class="option-text"><span class="option-title">36 – 45 años</span><span class="option-desc">La disciplina supera la genética · Aún queda mucho</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="50" onclick="selectOption('edad','50',this)">
+          <span class="option-icon">🏆</span>
+          <span class="option-text"><span class="option-title">Más de 45 años</span><span class="option-desc">Resultados totalmente alcanzables con el método correcto</span></span>
+          <span class="option-radio"></span>
+        </button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" id="btn-edad" onclick="goNext()" disabled>CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 3: ALTURA ═══ -->
+  <div class="screen" id="screen-3">
+    <div class="q-step">Paso 3 de 10</div>
+    <h2 class="q-title">¿CUÁNTO<br>MIDES?</h2>
+    <p class="q-subtitle">Tu estructura ósea determina en parte tu límite superior de masa muscular.</p>
+    <div class="q-content">
+      <div class="num-picker">
+        <button class="num-btn" onclick="adjustNum('altura', -1)">−</button>
+        <div class="num-display">
+          <div class="num-val" id="val-altura">175</div>
+          <div class="num-unit">cm</div>
+        </div>
+        <button class="num-btn" onclick="adjustNum('altura', +1)">+</button>
+      </div>
+      <p class="num-hint">Mantén pulsado para cambio rápido</p>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" onclick="goNext()">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 4: PESO ═══ -->
+  <div class="screen" id="screen-4">
+    <div class="q-step">Paso 4 de 10</div>
+    <h2 class="q-title">¿CUÁNTO<br>PESAS HOY?</h2>
+    <p class="q-subtitle">Tu peso actual junto con tu % de grasa nos da tu masa muscular real.</p>
+    <div class="q-content">
+      <div class="num-picker">
+        <button class="num-btn" onclick="adjustNum('peso', -1)">−</button>
+        <div class="num-display">
+          <div class="num-val" id="val-peso">75</div>
+          <div class="num-unit">kg</div>
+        </div>
+        <button class="num-btn" onclick="adjustNum('peso', +1)">+</button>
+      </div>
+      <p class="num-hint">Mantén pulsado para cambio rápido</p>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" onclick="goNext()">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 5: AÑOS ENTRENANDO ═══ -->
+  <div class="screen" id="screen-5">
+    <div class="q-step">Paso 5 de 10</div>
+    <h2 class="q-title">¿CUÁNTO<br>LLEVAS<br>ENTRENANDO?</h2>
+    <p class="q-subtitle">El tiempo de entrenamiento serio con progresión define en qué fase de ganancias estás.</p>
+    <div class="q-content">
+      <div class="options-list" id="options-anos">
+        <button class="option-btn" data-val="0.5" onclick="selectOption('anos','0.5',this)">
+          <span class="option-icon">🌱</span>
+          <span class="option-text"><span class="option-title">Menos de 1 año</span><span class="option-desc">Novato · Las ganancias ahora son las más rápidas de tu vida</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="1.5" onclick="selectOption('anos','1.5',this)">
+          <span class="option-icon">📈</span>
+          <span class="option-text"><span class="option-title">1 – 2 años</span><span class="option-desc">Intermedio temprano · Todavía hay mucho margen</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="2.5" onclick="selectOption('anos','2.5',this)">
+          <span class="option-icon">💪</span>
+          <span class="option-text"><span class="option-title">2 – 3 años</span><span class="option-desc">Intermedio · Base sólida, ganancias más lentas pero valiosas</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="4" onclick="selectOption('anos','4',this)">
+          <span class="option-icon">🔬</span>
+          <span class="option-text"><span class="option-title">3 – 5 años</span><span class="option-desc">Avanzado temprano · Cada kilo ganado es oro</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="6.5" onclick="selectOption('anos','6.5',this)">
+          <span class="option-icon">🏋️</span>
+          <span class="option-text"><span class="option-title">5 – 8 años</span><span class="option-desc">Avanzado · El método importa más que nunca</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="10" onclick="selectOption('anos','10',this)">
+          <span class="option-icon">🎖️</span>
+          <span class="option-text"><span class="option-title">Más de 8 años</span><span class="option-desc">Elite · Estás cerca de tu techo, hay que ser quirúrgico</span></span>
+          <span class="option-radio"></span>
+        </button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" id="btn-anos" onclick="goNext()" disabled>CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 6: GRASA CORPORAL ═══ -->
+  <div class="screen" id="screen-6">
+    <div class="q-step">Paso 6 de 10</div>
+    <h2 class="q-title">¿CON QUÉ TE<br>IDENTIFICAS?</h2>
+    <p class="q-subtitle">Elige la imagen que más se parezca a tu apariencia actual (en condición neutral, sin bomba).</p>
+    <div class="q-content">
+      <div class="bf-grid" id="bf-grid">
+
+        <div class="bf-card" onclick="selectBF('3',this)" data-val="3.5">
+          <div class="bf-svg-wrap">
+            <svg viewBox="0 0 80 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14,10 Q25,4 40,3 Q55,4 66,10 L70,38 Q74,72 66,98 L14,98 Q6,72 10,38 Z" fill="#c8c4c0"/>
+              <path d="M18,26 Q24,18 33,21 Q40,23 38,33 Q36,40 26,38 Q16,34 18,26 Z" fill="#b8b4b0"/>
+              <path d="M62,26 Q56,18 47,21 Q40,23 42,33 Q44,40 54,38 Q64,34 62,26 Z" fill="#b8b4b0"/>
+              <line x1="40" y1="18" x2="40" y2="96" stroke="#888" stroke-width="1.8"/>
+              <path d="M22,48 Q31,44 40,45 Q49,44 58,48" stroke="#888" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M21,62 Q31,58 40,59 Q49,58 59,62" stroke="#888" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M20,76 Q31,72 40,73 Q49,72 60,76" stroke="#888" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M20,90 Q31,86 40,87 Q49,86 60,90" stroke="#888" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M11,55 Q15,68 12,82" stroke="#999" stroke-width="1" stroke-linecap="round" fill="none"/>
+              <path d="M69,55 Q65,68 68,82" stroke="#999" stroke-width="1" stroke-linecap="round" fill="none"/>
+              <path d="M13,56 L18,59 M12,64 L17,67 M12,72 L17,75" stroke="#aaa" stroke-width="0.8" stroke-linecap="round"/>
+              <path d="M67,56 L62,59 M68,64 L63,67 M68,72 L63,75" stroke="#aaa" stroke-width="0.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="bf-pct">3–4%</div>
+          <div class="bf-desc">Estriaciones visibles, venoso</div>
+        </div>
+
+        <div class="bf-card" onclick="selectBF('6',this)" data-val="6">
+          <div class="bf-svg-wrap">
+            <svg viewBox="0 0 80 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13,10 Q25,4 40,3 Q55,4 67,10 L71,38 Q75,72 67,98 L13,98 Q5,72 9,38 Z" fill="#ccc8c3"/>
+              <path d="M17,26 Q23,18 32,21 Q40,23 38,33 Q36,40 25,38 Q15,35 17,26 Z" fill="#bdbab5"/>
+              <path d="M63,26 Q57,18 48,21 Q40,23 42,33 Q44,40 55,38 Q65,35 63,26 Z" fill="#bdbab5"/>
+              <line x1="40" y1="18" x2="40" y2="96" stroke="#999" stroke-width="1.5"/>
+              <path d="M22,48 Q31,45 40,46 Q49,45 58,48" stroke="#999" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <path d="M21,62 Q31,59 40,60 Q49,59 59,62" stroke="#999" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <path d="M21,76 Q31,73 40,74 Q49,73 59,76" stroke="#999" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <path d="M12,58 Q16,70 13,83" stroke="#aaa" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+              <path d="M68,58 Q64,70 67,83" stroke="#aaa" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="bf-pct">5–7%</div>
+          <div class="bf-desc">6-pack claro, algo de vascularity</div>
+        </div>
+
+        <div class="bf-card" onclick="selectBF('10',this)" data-val="10">
+          <div class="bf-svg-wrap">
+            <svg viewBox="0 0 80 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12,10 Q24,4 40,3 Q56,4 68,10 L73,40 Q77,73 68,98 L12,98 Q3,73 7,40 Z" fill="#d0ccc7"/>
+              <path d="M16,26 Q23,18 33,21 Q40,24 38,34 Q36,41 25,39 Q14,36 16,26 Z" fill="#c3bfba"/>
+              <path d="M64,26 Q57,18 47,21 Q40,24 42,34 Q44,41 55,39 Q66,36 64,26 Z" fill="#c3bfba"/>
+              <line x1="40" y1="18" x2="40" y2="96" stroke="#aaa" stroke-width="1.3"/>
+              <path d="M22,49 Q31,46 40,47 Q49,46 58,49" stroke="#aaa" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+              <path d="M21,63 Q31,60 40,61 Q49,60 59,63" stroke="#aaa" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+              <path d="M21,77 Q31,74 40,75 Q49,74 59,77" stroke="#aaa" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="bf-pct">8–12%</div>
+          <div class="bf-desc">Abdominales definidos, separación muscular</div>
+        </div>
+
+        <div class="bf-card" onclick="selectBF('15',this)" data-val="15">
+          <div class="bf-svg-wrap">
+            <svg viewBox="0 0 80 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11,10 Q23,4 40,3 Q57,4 69,10 L74,42 Q79,75 70,98 L10,98 Q1,75 6,42 Z" fill="#d4d0cb"/>
+              <path d="M15,26 Q22,18 33,21 Q41,24 39,35 Q37,43 24,41 Q12,38 15,26 Z" fill="#c9c5c0"/>
+              <path d="M65,26 Q58,18 47,21 Q39,24 41,35 Q43,43 56,41 Q68,38 65,26 Z" fill="#c9c5c0"/>
+              <line x1="40" y1="20" x2="40" y2="96" stroke="#bbb" stroke-width="1"/>
+              <path d="M22,52 Q31,50 40,51 Q49,50 58,52" stroke="#bbb" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+              <path d="M21,66 Q31,64 40,65 Q49,64 59,66" stroke="#bbb" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="bf-pct">13–17%</div>
+          <div class="bf-desc">Algo de definición, bajo relieve</div>
+        </div>
+
+        <div class="bf-card" onclick="selectBF('20',this)" data-val="20">
+          <div class="bf-svg-wrap">
+            <svg viewBox="0 0 80 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10,10 Q22,4 40,3 Q58,4 70,10 L76,44 Q82,76 73,98 L7,98 Q-2,76 4,44 Z" fill="#d8d4ce"/>
+              <path d="M14,26 Q21,17 33,20 Q42,23 40,36 Q38,45 23,43 Q11,40 14,26 Z" fill="#cecac5"/>
+              <path d="M66,26 Q59,17 47,20 Q38,23 40,36 Q42,45 57,43 Q69,40 66,26 Z" fill="#cecac5"/>
+              <line x1="40" y1="22" x2="40" y2="96" stroke="#ccc" stroke-width="0.7"/>
+            </svg>
+          </div>
+          <div class="bf-pct">18–23%</div>
+          <div class="bf-desc">Suave, sin definición visible</div>
+        </div>
+
+        <div class="bf-card" onclick="selectBF('26',this)" data-val="26">
+          <div class="bf-svg-wrap">
+            <svg viewBox="0 0 80 106" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9,10 Q21,4 40,3 Q59,4 71,10 L79,46 Q87,78 76,98 L4,98 Q-7,78 1,46 Z" fill="#dbd7d2"/>
+              <path d="M13,26 Q20,16 33,20 Q43,23 41,38 Q39,48 22,46 Q9,42 13,26 Z" fill="#d3cfca"/>
+              <path d="M67,26 Q60,16 47,20 Q37,23 39,38 Q41,48 58,46 Q71,42 67,26 Z" fill="#d3cfca"/>
+            </svg>
+          </div>
+          <div class="bf-pct">24–29%</div>
+          <div class="bf-desc">Redondo, sin definición</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" id="btn-bf" onclick="goNext()" disabled>CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 7: GENÉTICA ═══ -->
+  <div class="screen" id="screen-7">
+    <div class="q-step">Paso 7 de 10</div>
+    <h2 class="q-title">¿CÓMO HAS<br>RESPONDIDO AL<br>ENTRENAMIENTO?</h2>
+    <p class="q-subtitle">Esto es genética percibida. Sé honesto, afecta el cálculo real.</p>
+    <div class="q-content">
+      <div class="options-list" id="options-genetica">
+        <button class="option-btn" data-val="-2.5" onclick="selectOption('genetica','-2.5',this)">
+          <span class="option-icon">😔</span>
+          <span class="option-text"><span class="option-title">Me cuesta mucho más que a otros</span><span class="option-desc">Poco músculo, mucha grasa con facilidad</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="-1.5" onclick="selectOption('genetica','-1.5',this)">
+          <span class="option-icon">😐</span>
+          <span class="option-text"><span class="option-title">Algo por debajo de la media</span><span class="option-desc">Progreso lento, tendencia a acumular grasa</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="0" onclick="selectOption('genetica','0',this)">
+          <span class="option-icon">👌</span>
+          <span class="option-text"><span class="option-title">Normal, como la mayoría</span><span class="option-desc">Resultados estándar siguiendo los principios básicos</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="1" onclick="selectOption('genetica','1',this)">
+          <span class="option-icon">💪</span>
+          <span class="option-text"><span class="option-title">Respondo mejor que la mayoría</span><span class="option-desc">Gano músculo con relativa facilidad, poca grasa</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="2" onclick="selectOption('genetica','2',this)">
+          <span class="option-icon">🔥</span>
+          <span class="option-text"><span class="option-title">Respuesta excepcional</span><span class="option-desc">Todo se me nota rápido, recuperación rápida, estructura favorable</span></span>
+          <span class="option-radio"></span>
+        </button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" id="btn-genetica" onclick="goNext()" disabled>CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 8: OBJETIVO ═══ -->
+  <div class="screen" id="screen-8">
+    <div class="q-step">Paso 8 de 10</div>
+    <h2 class="q-title">¿CUÁL ES TU<br>OBJETIVO<br>AHORA MISMO?</h2>
+    <p class="q-subtitle">Esto define cómo interpretamos tu potencial en los próximos 12 meses.</p>
+    <div class="q-content">
+      <div class="options-list" id="options-objetivo">
+        <button class="option-btn" data-val="masa" onclick="selectOption('objetivo','masa',this)">
+          <span class="option-icon">📈</span>
+          <span class="option-text"><span class="option-title">Ganar masa muscular</span><span class="option-desc">Volumen, más músculo, aumentar peso de forma controlada</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="fuerza" onclick="selectOption('objetivo','fuerza',this)">
+          <span class="option-icon">🏋️</span>
+          <span class="option-text"><span class="option-title">Aumentar fuerza</span><span class="option-desc">Mover más kilos, romper récords personales</span></span>
+          <span class="option-radio"></span>
+        </button>
+        <button class="option-btn" data-val="composicion" onclick="selectOption('objetivo','composicion',this)">
+          <span class="option-icon">🎯</span>
+          <span class="option-text"><span class="option-title">Mejorar composición corporal</span><span class="option-desc">Perder grasa y ganar músculo al mismo tiempo · Recomp</span></span>
+          <span class="option-radio"></span>
+        </button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" id="btn-objetivo" onclick="goNext()" disabled>CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 9: FUERZA (OPCIONAL) ═══ -->
+  <div class="screen" id="screen-9">
+    <div class="q-step">Paso 9 de 10 <span style="display:inline-block;background:rgba(255,255,255,0.07);color:var(--muted);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-left:6px;">OPCIONAL</span></div>
+    <h2 class="q-title">FUERZA EN<br>LOS BÁSICOS</h2>
+    <p class="q-subtitle">Si los haces, introduce el peso y las reps de tu última serie intensa. Más datos = resultado más preciso.</p>
+    <div class="q-content">
+      <div class="strength-list">
+        <div class="strength-row">
+          <div class="strength-name"><span class="s-icon">🏋️</span> Press de banca</div>
+          <div class="strength-inputs-row">
+            <div class="s-input-wrap"><label>Peso (kg)</label><input type="number" id="banca-kg" placeholder="—" min="0" max="500"></div>
+            <div class="s-input-wrap"><label>Repeticiones</label><input type="number" id="banca-reps" placeholder="—" min="1" max="50"></div>
+          </div>
+        </div>
+        <div class="strength-row">
+          <div class="strength-name"><span class="s-icon">🦵</span> Sentadilla</div>
+          <div class="strength-inputs-row">
+            <div class="s-input-wrap"><label>Peso (kg)</label><input type="number" id="squat-kg" placeholder="—" min="0" max="500"></div>
+            <div class="s-input-wrap"><label>Repeticiones</label><input type="number" id="squat-reps" placeholder="—" min="1" max="50"></div>
+          </div>
+        </div>
+        <div class="strength-row">
+          <div class="strength-name"><span class="s-icon">💪</span> Peso muerto</div>
+          <div class="strength-inputs-row">
+            <div class="s-input-wrap"><label>Peso (kg)</label><input type="number" id="dead-kg" placeholder="—" min="0" max="600"></div>
+            <div class="s-input-wrap"><label>Repeticiones</label><input type="number" id="dead-reps" placeholder="—" min="1" max="50"></div>
+          </div>
+        </div>
+        <div class="strength-row">
+          <div class="strength-name"><span class="s-icon">🚣</span> Remo con barra</div>
+          <div class="strength-inputs-row">
+            <div class="s-input-wrap"><label>Peso (kg)</label><input type="number" id="remo-kg" placeholder="—" min="0" max="300"></div>
+            <div class="s-input-wrap"><label>Repeticiones</label><input type="number" id="remo-reps" placeholder="—" min="1" max="50"></div>
+          </div>
+        </div>
+        <div class="strength-row">
+          <div class="strength-name"><span class="s-icon">⬆️</span> Dominadas</div>
+          <div class="strength-inputs-row" style="grid-template-columns:1fr;">
+            <div class="s-input-wrap"><label>Reps máximas (peso corporal)</label><input type="number" id="pull-reps" placeholder="—" min="0" max="50"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="skip-row">
+      <button class="skip-btn" onclick="goNext()">No hago estos ejercicios, saltar →</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" onclick="goNext()">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 10: PERÍMETROS (OPCIONAL) ═══ -->
+  <div class="screen" id="screen-10">
+    <div class="q-step">Paso 10 de 10 <span style="display:inline-block;background:rgba(255,255,255,0.07);color:var(--muted);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-left:6px;">OPCIONAL</span></div>
+    <h2 class="q-title">PERÍMETROS<br>MUSCULARES</h2>
+    <p class="q-subtitle">Si los conoces, añádelos. Cruzamos estos datos con tu potencial genético.</p>
+    <div class="q-content">
+      <div class="measure-grid">
+        <div class="measure-card">
+          <div class="measure-label">💪 Brazo relajado</div>
+          <div class="measure-inner">
+            <input type="number" class="measure-input" id="m-brazo" placeholder="—" min="20" max="60">
+            <span class="measure-unit">cm</span>
+          </div>
+        </div>
+        <div class="measure-card">
+          <div class="measure-label">📐 Pecho</div>
+          <div class="measure-inner">
+            <input type="number" class="measure-input" id="m-pecho" placeholder="—" min="60" max="160">
+            <span class="measure-unit">cm</span>
+          </div>
+        </div>
+        <div class="measure-card">
+          <div class="measure-label">🦵 Muslo</div>
+          <div class="measure-inner">
+            <input type="number" class="measure-input" id="m-muslo" placeholder="—" min="30" max="90">
+            <span class="measure-unit">cm</span>
+          </div>
+        </div>
+        <div class="measure-card">
+          <div class="measure-label">⬜ Cintura</div>
+          <div class="measure-inner">
+            <input type="number" class="measure-input" id="m-cintura" placeholder="—" min="50" max="140">
+            <span class="measure-unit">cm</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="skip-row">
+      <button class="skip-btn" onclick="calculate()">No los tengo, calcular directamente →</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goPrev()">←</button>
+      <button class="btn-next" onclick="calculate()">VER MI POTENCIAL →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 11: CALCULANDO ═══ -->
+  <div class="screen calculating-screen" id="screen-calc">
+    <div class="calc-ring"></div>
+    <div class="calc-title">ANALIZANDO<br>TU POTENCIAL</div>
+    <div class="calc-subtitle" id="calc-msg">Procesando datos biológicos…</div>
+  </div>
+
+  <!-- ═══ SCREEN 12: RESULTADOS ═══ -->
+  <div class="screen results-screen" id="screen-results">
+    <!-- Populated by JS -->
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const state = {
+  current: 0,
+  total: 12,
+  data: {
+    nombre: '',
+    edad: null,
+    altura: 175,
+    peso: 75,
+    anos: null,
+    bf: null,
+    genetica: null,
+    objetivo: null,
+    bancaKg: '', bancaReps: '',
+    squatKg: '', squatReps: '',
+    deadKg: '', deadReps: '',
+    remoKg: '', remoReps: '',
+    pullReps: '',
+    brazo: '', pecho: '', muslo: '', cintura: ''
+  }
+};
+
+const screens = ['screen-0','screen-1','screen-2','screen-3','screen-4','screen-5','screen-6','screen-7','screen-8','screen-9','screen-10','screen-calc','screen-results'];
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+function goNext() {
+  if (state.current < 10) {
+    const old = state.current;
+    state.current++;
+    transition(old, state.current);
+    updateProgress();
+  }
+}
+
+function goPrev() {
+  if (state.current > 0) {
+    const old = state.current;
+    state.current--;
+    transition(old, state.current, true);
+    updateProgress();
+  }
+}
+
+function transition(from, to, back = false) {
+  const fromEl = document.getElementById(screens[from]);
+  const toEl = document.getElementById(screens[to]);
+
+  if (back) {
+    fromEl.style.transition = 'none';
+    toEl.style.transition = 'none';
+    toEl.style.transform = 'translateX(-80px)';
+    toEl.style.opacity = '0';
+    toEl.classList.add('active');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        fromEl.style.transition = '';
+        toEl.style.transition = '';
+        fromEl.style.transform = 'translateX(100%)';
+        fromEl.style.opacity = '0';
+        toEl.style.transform = 'translateX(0)';
+        toEl.style.opacity = '1';
+        setTimeout(() => {
+          fromEl.classList.remove('active');
+          fromEl.style.transform = '';
+          fromEl.style.opacity = '';
+        }, 380);
+      });
+    });
+  } else {
+    toEl.style.transition = 'none';
+    toEl.style.transform = 'translateX(100%)';
+    toEl.style.opacity = '0';
+    toEl.classList.add('active');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        fromEl.style.transition = '';
+        toEl.style.transition = '';
+        fromEl.classList.add('exit-left');
+        toEl.style.transform = 'translateX(0)';
+        toEl.style.opacity = '1';
+        setTimeout(() => {
+          fromEl.classList.remove('active','exit-left');
+          fromEl.style.transform = '';
+          fromEl.style.opacity = '';
+        }, 380);
+      });
+    });
+  }
+
+  // Collect data before leaving
+  collectData(from);
+}
+
+function updateProgress() {
+  const pct = (state.current / 10) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+// ═══════════════════════════════════════════════
+//  DATA COLLECTION
+// ═══════════════════════════════════════════════
+function collectData(screenIdx) {
+  if (screenIdx === 1) state.data.nombre = (document.getElementById('input-nombre').value || '').trim();
+  if (screenIdx === 3) state.data.altura = parseInt(document.getElementById('val-altura').textContent);
+  if (screenIdx === 4) state.data.peso = parseInt(document.getElementById('val-peso').textContent);
+  if (screenIdx === 9) {
+    state.data.bancaKg = document.getElementById('banca-kg').value;
+    state.data.bancaReps = document.getElementById('banca-reps').value;
+    state.data.squatKg = document.getElementById('squat-kg').value;
+    state.data.squatReps = document.getElementById('squat-reps').value;
+    state.data.deadKg = document.getElementById('dead-kg').value;
+    state.data.deadReps = document.getElementById('dead-reps').value;
+    state.data.remoKg = document.getElementById('remo-kg').value;
+    state.data.remoReps = document.getElementById('remo-reps').value;
+    state.data.pullReps = document.getElementById('pull-reps').value;
+  }
+  if (screenIdx === 10) {
+    state.data.brazo = document.getElementById('m-brazo').value;
+    state.data.pecho = document.getElementById('m-pecho').value;
+    state.data.muslo = document.getElementById('m-muslo').value;
+    state.data.cintura = document.getElementById('m-cintura').value;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SELECTORS
+// ═══════════════════════════════════════════════
+function selectOption(field, val, btn) {
+  const container = btn.closest('.options-list');
+  container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.data[field] = parseFloat(val) || val;
+
+  // Enable next button
+  const btnMap = { edad: 'btn-edad', anos: 'btn-anos', genetica: 'btn-genetica', objetivo: 'btn-objetivo' };
+  const nextBtn = document.getElementById(btnMap[field]);
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function selectBF(val, card) {
+  document.querySelectorAll('.bf-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  state.data.bf = parseFloat(card.dataset.val);
+  document.getElementById('btn-bf').disabled = false;
+}
+
+// ═══════════════════════════════════════════════
+//  NUMBER PICKER
+// ═══════════════════════════════════════════════
+const numConfig = { altura: { min: 140, max: 220, el: 'val-altura' }, peso: { min: 30, max: 200, el: 'val-peso' } };
+let holdTimer = null;
+let holdInterval = null;
+
+function adjustNum(field, delta) {
+  const cfg = numConfig[field];
+  const el = document.getElementById(cfg.el);
+  let val = parseInt(el.textContent) + delta;
+  val = Math.max(cfg.min, Math.min(cfg.max, val));
+  el.textContent = val;
+}
+
+document.querySelectorAll('.num-btn').forEach(btn => {
+  const doAdjust = () => {
+    const field = btn.closest('.num-picker').querySelector('.num-val').id.replace('val-', '');
+    const delta = btn.textContent.trim() === '+' ? 1 : -1;
+    adjustNum(field, delta);
+  };
+
+  btn.addEventListener('mousedown', () => {
+    holdTimer = setTimeout(() => {
+      holdInterval = setInterval(doAdjust, 80);
+    }, 400);
+  });
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    holdTimer = setTimeout(() => {
+      holdInterval = setInterval(doAdjust, 80);
+    }, 400);
+  }, { passive: false });
+
+  const stop = () => {
+    clearTimeout(holdTimer);
+    clearInterval(holdInterval);
+    holdTimer = holdInterval = null;
+  };
+  btn.addEventListener('mouseup', stop);
+  btn.addEventListener('mouseleave', stop);
+  btn.addEventListener('touchend', stop);
+});
+
+// ═══════════════════════════════════════════════
+//  CALCULATION ENGINE
+// ═══════════════════════════════════════════════
+function epley1RM(weight, reps) {
+  if (!weight || !reps || reps < 1) return 0;
+  return weight * (1 + reps / 30);
+}
+
+function calcStrengthScore(peso) {
+  const exercises = [];
+
+  const bKg = parseFloat(state.data.bancaKg), bReps = parseFloat(state.data.bancaReps);
+  const sKg = parseFloat(state.data.squatKg), sReps = parseFloat(state.data.squatReps);
+  const dKg = parseFloat(state.data.deadKg), dReps = parseFloat(state.data.deadReps);
+  const rKg = parseFloat(state.data.remoKg), rReps = parseFloat(state.data.remoReps);
+  const pReps = parseFloat(state.data.pullReps);
+
+  // Natural elite benchmarks (relative to BW)
+  const benchmarks = {
+    banca:    { name: 'Press banca', elite: 1.5 },
+    squat:    { name: 'Sentadilla', elite: 2.0 },
+    dead:     { name: 'Peso muerto', elite: 2.5 },
+    remo:     { name: 'Remo', elite: 1.25 }
+  };
+
+  if (bKg && bReps) {
+    const rm = epley1RM(bKg, bReps);
+    const ratio = rm / peso;
+    const pct = Math.min(100, (ratio / benchmarks.banca.elite) * 100);
+    exercises.push({ name: 'Press banca', score: pct, rm: Math.round(rm), ratio: ratio.toFixed(2) });
+  }
+  if (sKg && sReps) {
+    const rm = epley1RM(sKg, sReps);
+    const ratio = rm / peso;
+    const pct = Math.min(100, (ratio / benchmarks.squat.elite) * 100);
+    exercises.push({ name: 'Sentadilla', score: pct, rm: Math.round(rm), ratio: ratio.toFixed(2) });
+  }
+  if (dKg && dReps) {
+    const rm = epley1RM(dKg, dReps);
+    const ratio = rm / peso;
+    const pct = Math.min(100, (ratio / benchmarks.dead.elite) * 100);
+    exercises.push({ name: 'Peso muerto', score: pct, rm: Math.round(rm), ratio: ratio.toFixed(2) });
+  }
+  if (rKg && rReps) {
+    const rm = epley1RM(rKg, rReps);
+    const ratio = rm / peso;
+    const pct = Math.min(100, (ratio / benchmarks.remo.elite) * 100);
+    exercises.push({ name: 'Remo', score: pct, rm: Math.round(rm), ratio: ratio.toFixed(2) });
+  }
+  if (pReps) {
+    // Pullups: elite = 20+ reps
+    const pct = Math.min(100, (pReps / 20) * 100);
+    exercises.push({ name: 'Dominadas', score: pct, rm: Math.round(pReps) + ' reps', ratio: null });
+  }
+
+  if (exercises.length === 0) return null;
+  const avg = exercises.reduce((s,e) => s + e.score, 0) / exercises.length;
+  return { avg: Math.round(avg), exercises };
+}
+
+function getLevelLabel(score) {
+  if (score >= 85) return { label: 'ÉLITE NATURAL', color: 'var(--red)' };
+  if (score >= 65) return { label: 'AVANZADO', color: 'var(--green)' };
+  if (score >= 40) return { label: 'INTERMEDIO', color: 'var(--orange)' };
+  return { label: 'PRINCIPIANTE', color: '#888' };
+}
+
+function calculate() {
+  // Collect any remaining data
+  collectData(9);
+  collectData(10);
+
+  // Safety defaults
+  const d = state.data;
+  if (!d.altura) d.altura = parseInt(document.getElementById('val-altura').textContent) || 175;
+  if (!d.peso)   d.peso   = parseInt(document.getElementById('val-peso').textContent)   || 75;
+
+  // Show calculating screen
+  state.current = 11;
+  const old = 10;
+  transition(old, state.current);
+  updateProgress();
+
+  const msgs = [
+    'Calculando tu masa magra actual…',
+    'Aplicando algoritmo de potencial genético…',
+    'Proyectando tus ganancias a 12 meses…',
+    'Validando con datos de fuerza…',
+    'Generando tu informe personalizado…'
+  ];
+  let mi = 0;
+  const msgEl = document.getElementById('calc-msg');
+  const msgInterval = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    msgEl.textContent = msgs[mi];
+  }, 600);
+
+  setTimeout(() => {
+    clearInterval(msgInterval);
+    showResults();
+  }, 3200);
+}
+
+function showResults() {
+  const d = state.data;
+  const peso = d.peso || 75;
+  const altura = d.altura || 175;
+  const bf = d.bf || 15;
+  const edad = d.edad || 27;
+  const anos = d.anos || 2;
+  const geneticaMod = (d.genetica !== null && d.genetica !== undefined) ? d.genetica : 0;
+
+  // ── FFMI-based max LBM calculation ──
+  // Natural FFMI ceiling: 25 (elite natural), adjusted by genetics
+  const ffmiBase = 25;
+  const ffmiGenetics = ffmiBase + geneticaMod;
+  const heightM = altura / 100;
+
+  // Age adjustment to FFMI potential
+  let ageFactor = 1.0;
+  if (edad < 20) ageFactor = 0.92;
+  else if (edad >= 45) ageFactor = 0.93;
+  else if (edad >= 36) ageFactor = 0.97;
+
+  const ffmiMax = ffmiGenetics * ageFactor;
+  const maxLBM = ffmiMax * (heightM * heightM); // kg
+
+  // Current LBM
+  const currentLBM = peso * (1 - bf / 100);
+
+  // FFMI current
+  const currentFFMI = currentLBM / (heightM * heightM);
+
+  // Potential achieved
+  let potPct = Math.round((currentLBM / maxLBM) * 100);
+  potPct = Math.max(5, Math.min(98, potPct));
+
+  // Max weight at 10% bf
+  const maxWeightAt10 = maxLBM / 0.90;
+
+  // 12-month potential LBM gain (based on training years)
+  let annualRateKg;
+  if (anos <= 0.8) annualRateKg = 7;
+  else if (anos <= 1.5) annualRateKg = 4.5;
+  else if (anos <= 2.5) annualRateKg = 3;
+  else if (anos <= 4) annualRateKg = 2;
+  else if (anos <= 7) annualRateKg = 1.2;
+  else annualRateKg = 0.6;
+
+  // Objective modifier
+  if (d.objetivo === 'composicion') annualRateKg *= 0.75;
+  if (d.objetivo === 'fuerza') annualRateKg *= 0.85;
+
+  const remainingPotential = maxLBM - currentLBM;
+  const gain12m = Math.min(annualRateKg, Math.max(0.2, remainingPotential));
+  const gain12mRound = Math.max(0.2, parseFloat(gain12m.toFixed(1)));
+
+  // Years to near-peak (90% of max)
+  const target90 = maxLBM * 0.90;
+  const remaining90 = Math.max(0, target90 - currentLBM);
+  let yearsToNearPeak = 0;
+  let rem = remaining90;
+  const rates = [7, 4.5, 3, 2, 1.2, 0.8];
+  let yearIdx = Math.min(Math.floor(anos), rates.length - 1);
+  while (rem > 0.5 && yearsToNearPeak < 15) {
+    const r = rates[Math.min(yearIdx, rates.length - 1)];
+    rem -= r * (d.objetivo === 'composicion' ? 0.75 : 1);
+    yearsToNearPeak++;
+    yearIdx++;
+  }
+  if (potPct >= 90) yearsToNearPeak = 0;
+
+  // Current weight at goal BF (10%)
+  const targetWeight = currentLBM / 0.90;
+
+  // Strength analysis
+  const strengthData = calcStrengthScore(peso);
+
+  // Measurement potential
+  let brazoMax = null;
+  if (d.brazo) {
+    // Max arm size (cm) using height-based formula
+    // ~height * 0.4 inches, rough proxy in cm: height * 0.28 for elite natural
+    brazoMax = Math.round(altura * 0.28);
+  }
+
+  // Personalized message
+  let message = '';
+  const nombre = d.nombre ? d.nombre : 'tú';
+  if (potPct >= 90) {
+    message = `Estás en el <strong>${potPct}%</strong> de tu límite natural. Eso es territorio de élite. El problema no es el potencial, es que cada décima requiere precisión quirúrgica. Aquí es donde la mayoría se estanca para siempre.`;
+  } else if (potPct >= 70) {
+    message = `Llevas <strong>${Math.round(anos)} años</strong> construyendo una base sólida. Estás en el <strong>${potPct}%</strong> de tu techo. El territorio entre el ${potPct}% y el 90% es donde la mayoría se queda atascada por años sin el método correcto.`;
+  } else if (potPct >= 45) {
+    message = `Con <strong>${Math.round(anos > 1 ? anos : anos * 12)} ${anos >= 1 ? 'años' : 'meses'}</strong> entrenando, has construido una base real. Pero todavía tienes <strong>más del 50% de tu potencial sin tocar</strong>. Las ganancias más importantes aún están por venir.`;
+  } else {
+    message = `Llevas poco tiempo, y eso es una <strong>ventaja brutal</strong>. Tienes la mayor tasa de ganancias que vas a experimentar en toda tu vida de entrenamiento. Lo que hagas ahora define todo lo que viene después.`;
+  }
+
+  // Training years message
+  let anosMsg = '';
+  if (anos <= 0.8) anosMsg = 'Estás en la etapa de ganancias más explosivas de toda tu carrera.';
+  else if (anos <= 2) anosMsg = `${Math.round(anos * 12)} meses de base sólida. Los principios fundamentales siguen siendo tu mayor palanca.`;
+  else if (anos <= 5) anosMsg = `${Math.round(anos)} años entrenando. Base sólida. Ahora la optimización marca la diferencia.`;
+  else anosMsg = `${Math.round(anos)} años en el gym. Tienes experiencia real. El detalle y la periodización son lo que te separa del siguiente nivel.`;
+
+  // Build results HTML
+  const resultsEl = document.getElementById('screen-results');
+  resultsEl.innerHTML = `
+    <div class="results-header">
+      ${d.nombre ? `<div class="results-hey">Resultados de ${d.nombre}</div>` : '<div class="results-hey">Tus resultados</div>'}
+      <div class="results-title">TU <span class="red">POTENCIAL</span><br>NATURAL</div>
+    </div>
+
+    <!-- POTENCIAL PRINCIPAL -->
+    <div class="potential-card" id="res-main">
+      <div class="pot-label">Potencial actual alcanzado</div>
+      <div class="pot-number-row">
+        <div class="pot-number" id="pot-counter">0</div>
+        <div class="pot-number-label">% de tu límite natural</div>
+      </div>
+      <div class="pot-bar-bg">
+        <div class="pot-bar" id="pot-bar"></div>
+      </div>
+      <div class="pot-bar-labels">
+        <span>0%</span>
+        <span>Tu límite: ${Math.round(maxLBM)} kg masa magra</span>
+        <span>100%</span>
+      </div>
+      <div class="pot-message">${message}</div>
+    </div>
+
+    <!-- STATS GRID -->
+    <div class="stats-grid">
+      <div class="stat-card" id="res-s1">
+        <div class="stat-lbl">Masa magra actual</div>
+        <div class="stat-val">${Math.round(currentLBM)}<span class="unit"> kg</span></div>
+        <div class="stat-sub">FFMI actual: ${currentFFMI.toFixed(1)}</div>
+      </div>
+      <div class="stat-card" id="res-s2">
+        <div class="stat-lbl">Límite superior natural</div>
+        <div class="stat-val">${Math.round(maxLBM)}<span class="unit"> kg</span></div>
+        <div class="stat-sub">FFMI techo: ${ffmiMax.toFixed(1)}</div>
+      </div>
+      <div class="stat-card" id="res-s3">
+        <div class="stat-lbl">Ganancia potencial 12 meses</div>
+        <div class="stat-val ${gain12mRound >= 3 ? 'green' : gain12mRound >= 1.5 ? 'orange' : 'red-text'}">+${gain12mRound}<span class="unit"> kg</span></div>
+        <div class="stat-sub">de masa muscular neta</div>
+      </div>
+      <div class="stat-card" id="res-s4">
+        <div class="stat-lbl">${potPct >= 90 ? 'Margen restante' : yearsToNearPeak === 0 ? 'Cerca del techo' : 'Años hasta el 90%'}</div>
+        <div class="stat-val">${potPct >= 90 ? (100 - potPct) + '<span class="unit">%</span>' : yearsToNearPeak === 0 ? '¡YA!' : yearsToNearPeak + '<span class="unit"> año' + (yearsToNearPeak > 1 ? 's' : '') + '</span>'}</div>
+        <div class="stat-sub">${potPct >= 90 ? 'Margen hasta el límite absoluto' : 'con el método adecuado'}</div>
+      </div>
+    </div>
+
+    <!-- COMPARATIVA VISUAL -->
+    <div class="compare-card" id="res-compare">
+      <div class="pot-label">Tu proyección: ahora vs objetivo</div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-num red-text">${peso}<span style="font-size:14px;color:var(--muted)"> kg</span></div>
+          <div class="compare-sublabel">${bf}% grasa</div>
+          <div class="compare-unit">AHORA</div>
+        </div>
+        <div class="compare-arrow">→</div>
+        <div class="compare-col">
+          <div class="compare-num green">${Math.round(peso + gain12mRound * 1.1)}<span style="font-size:14px;color:var(--muted)"> kg</span></div>
+          <div class="compare-sublabel">+${gain12mRound} kg músculo</div>
+          <div class="compare-unit">EN 12 MESES</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS PERSONALIZADOS -->
+    <div class="insight-card" id="res-i1">
+      <div class="insight-head"><span class="insight-icon">📊</span><span class="insight-title">Tu base de entrenamiento</span></div>
+      <div class="insight-body">${anosMsg}</div>
+    </div>
+
+    ${strengthData ? `
+    <div class="insight-card" id="res-i2">
+      <div class="insight-head"><span class="insight-icon">💪</span><span class="insight-title">Nivel de fuerza: <span style="color:${getLevelLabel(strengthData.avg).color}">${getLevelLabel(strengthData.avg).label}</span></span></div>
+      <div class="insight-body" style="margin-bottom:12px;">Tu fuerza relativa está al <strong>${strengthData.avg}%</strong> del estándar élite natural para tu peso corporal.</div>
+      <div>
+        ${strengthData.exercises.map(e => `
+          <div class="strength-result">
+            <span class="sr-name">${e.name}</span>
+            <div class="sr-bar-wrap">
+              <div class="sr-bar-bg"><div class="sr-bar" style="width:${e.score}%;background:${e.score >= 75 ? 'var(--green)' : e.score >= 45 ? 'var(--orange)' : 'var(--red)'};"></div></div>
+              <div class="sr-level" style="color:${e.score >= 75 ? 'var(--green)' : e.score >= 45 ? 'var(--orange)' : 'var(--red)'}">${Math.round(e.score)}% del elite</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    ${d.brazo ? `
+    <div class="insight-card" id="res-i3">
+      <div class="insight-head"><span class="insight-icon">📏</span><span class="insight-title">Potencial de brazos</span></div>
+      <div class="insight-body">Brazo actual: <strong>${d.brazo} cm</strong>. Tu potencial natural genético de brazos: <strong>~${brazoMax} cm</strong>. Quedan <strong>${Math.max(0, brazoMax - parseInt(d.brazo))} cm</strong> de margen real sin tocar.</div>
+    </div>
+    ` : ''}
+
+    <div class="insight-card" id="res-i4">
+      <div class="insight-head"><span class="insight-icon">🎯</span><span class="insight-title">El punto clave</span></div>
+      <div class="insight-body">${potPct >= 90 ? 'Estás en el top del natural. Cada ganancia desde aquí exige precisión absoluta en nutrición, programación y recuperación. No hay margen para el ensayo-error.' : potPct >= 60 ? 'Tienes potencial real sin explotar. La diferencia entre quien lo saca y quien no no es genética ni esfuerzo bruto. Es método. El método correcto aplicado consistentemente es lo que separa resultados mediocres de resultados excepcionales.' : 'Tienes TODO por delante. Las ganancias de los próximos 2-3 años, bien ejecutadas, superarán lo que la mayoría consigue en 10 años de entrenamiento random. El método ahora vale más que nunca.'}</div>
+    </div>
+
+    <!-- CTA SECTION -->
+    <div class="cta-section" id="res-cta">
+      <div class="cta-blob1"></div>
+      <div class="cta-blob2"></div>
+      <div class="cta-inner">
+        <div class="cta-eyebrow">El siguiente paso</div>
+        <div class="cta-title">DESCUBRE CÓMO<br>LOGRARLO<br>DE VERDAD</div>
+        <ul class="cta-steps">
+          <li><span class="step-num">1</span> Agenda una llamada conmigo</li>
+          <li><span class="step-num">2</span> Vemos tus objetivos y punto actual</li>
+          <li><span class="step-num">3</span> Cogemos confianza, sin presión</li>
+          <li><span class="step-num">4</span> Si encajamos, empezamos a trabajar</li>
+          <li><span class="step-num">5</span> Organizo tu ruta clara hacia tus objetivos</li>
+        </ul>
+        <button class="btn-cta" onclick="openCTA()">AGENDA TU LLAMADA GRATIS →</button>
+      </div>
+    </div>
+  `;
+
+  // Show results screen
+  state.current = 12;
+  const calcEl = document.getElementById('screen-calc');
+  const resEl = document.getElementById('screen-results');
+
+  calcEl.classList.add('exit-left');
+  resEl.classList.add('active');
+  resEl.style.opacity = '1';
+  resEl.style.transform = 'translateX(0)';
+
+  setTimeout(() => {
+    calcEl.classList.remove('active', 'exit-left');
+    animateResults(potPct);
+  }, 400);
+
+  document.getElementById('progressBar').style.width = '100%';
+}
+
+function animateResults(potPct) {
+  const delays = [0, 100, 200, 300, 400, 500, 600, 700];
+  const cards = [
+    'res-main', 'res-s1', 'res-s2', 'res-s3', 'res-s4',
+    'res-compare', 'res-i1', 'res-i2', 'res-i3', 'res-i4', 'res-cta'
+  ];
+
+  cards.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    setTimeout(() => {
+      el.classList.add('revealed');
+    }, i * 120);
+  });
+
+  // Animate counter
+  setTimeout(() => {
+    const counterEl = document.getElementById('pot-counter');
+    const barEl = document.getElementById('pot-bar');
+    let current = 0;
+    const step = potPct / 60;
+    const interval = setInterval(() => {
+      current = Math.min(potPct, current + step);
+      counterEl.textContent = Math.round(current);
+      if (current >= potPct) {
+        clearInterval(interval);
+        counterEl.textContent = potPct;
+      }
+    }, 25);
+
+    // Animate bar
+    setTimeout(() => {
+      barEl.style.width = potPct + '%';
+    }, 100);
+  }, 300);
+}
+
+function openCTA() {
+  // Replace with your actual booking link
+  alert('¡Genial! Contacta con GM Team para agendar tu llamada.\n\n📲 Accede a través de tu red social o enlace de contacto habitual.');
+}
+
+// Init
+updateProgress();
+</script>
+</body>
+</html>
