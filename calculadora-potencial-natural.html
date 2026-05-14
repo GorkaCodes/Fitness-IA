@@ -318,12 +318,20 @@
     }
     .num-btn:active { background: var(--red); border-color: var(--red); }
     .num-display { flex: 1; text-align: center; }
+    .num-val::-webkit-outer-spin-button,
+    .num-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .num-val[type=number] { -moz-appearance: textfield; appearance: textfield; }
     .num-val {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 68px;
       font-weight: 900;
       color: var(--text);
       line-height: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      text-align: center;
+      width: 100%;
     }
     .num-unit {
       font-size: 15px;
@@ -980,12 +988,12 @@
       <div class="num-picker">
         <button class="num-btn" onclick="adjustNum('altura', -1)">−</button>
         <div class="num-display">
-          <div class="num-val" id="val-altura">175</div>
+          <input type="number" class="num-val" id="val-altura" value="175" min="140" max="220" inputmode="numeric" onblur="clampNumInput('altura')">
           <div class="num-unit">cm</div>
         </div>
         <button class="num-btn" onclick="adjustNum('altura', +1)">+</button>
       </div>
-      <p class="num-hint">Mantén pulsado para cambio rápido</p>
+      <p class="num-hint">Escribe directamente o usa los botones</p>
     </div>
     <div class="nav-row">
       <button class="btn-back" onclick="goPrev()">←</button>
@@ -1002,12 +1010,12 @@
       <div class="num-picker">
         <button class="num-btn" onclick="adjustNum('peso', -1)">−</button>
         <div class="num-display">
-          <div class="num-val" id="val-peso">75</div>
+          <input type="number" class="num-val" id="val-peso" value="75" min="30" max="200" inputmode="numeric" onblur="clampNumInput('peso')">
           <div class="num-unit">kg</div>
         </div>
         <button class="num-btn" onclick="adjustNum('peso', +1)">+</button>
       </div>
-      <p class="num-hint">Mantén pulsado para cambio rápido</p>
+      <p class="num-hint">Escribe directamente o usa los botones</p>
     </div>
     <div class="nav-row">
       <button class="btn-back" onclick="goPrev()">←</button>
@@ -1463,8 +1471,8 @@ function updateProgress() {
 // ═══════════════════════════════════════════════
 function collectData(screenIdx) {
   if (screenIdx === 1) state.data.nombre = (document.getElementById('input-nombre').value || '').trim();
-  if (screenIdx === 3) state.data.altura = parseInt(document.getElementById('val-altura').textContent);
-  if (screenIdx === 4) state.data.peso = parseInt(document.getElementById('val-peso').textContent);
+  if (screenIdx === 3) state.data.altura = parseInt(document.getElementById('val-altura').value) || 175;
+  if (screenIdx === 4) state.data.peso = parseInt(document.getElementById('val-peso').value) || 75;
   if (screenIdx === 9) {
     state.data.bancaKg = document.getElementById('banca-kg').value;
     state.data.bancaReps = document.getElementById('banca-reps').value;
@@ -1491,7 +1499,8 @@ function selectOption(field, val, btn) {
   const container = btn.closest('.options-list');
   container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  state.data[field] = parseFloat(val) || val;
+  const _n = parseFloat(val);
+  state.data[field] = isNaN(_n) ? val : _n;
 
   // Enable next button
   const btnMap = { edad: 'btn-edad', anos: 'btn-anos', genetica: 'btn-genetica', objetivo: 'btn-objetivo' };
@@ -1516,14 +1525,22 @@ let holdInterval = null;
 function adjustNum(field, delta) {
   const cfg = numConfig[field];
   const el = document.getElementById(cfg.el);
-  let val = parseInt(el.textContent) + delta;
+  let val = (parseInt(el.value) || cfg.min) + delta;
   val = Math.max(cfg.min, Math.min(cfg.max, val));
-  el.textContent = val;
+  el.value = val;
+}
+
+function clampNumInput(field) {
+  const cfg = numConfig[field];
+  const el = document.getElementById(cfg.el);
+  let val = parseInt(el.value);
+  if (isNaN(val)) return;
+  el.value = Math.max(cfg.min, Math.min(cfg.max, val));
 }
 
 document.querySelectorAll('.num-btn').forEach(btn => {
   const doAdjust = () => {
-    const field = btn.closest('.num-picker').querySelector('.num-val').id.replace('val-', '');
+    const field = btn.closest('.num-picker').querySelector('input.num-val').id.replace('val-', '');
     const delta = btn.textContent.trim() === '+' ? 1 : -1;
     adjustNum(field, delta);
   };
@@ -1624,8 +1641,8 @@ function calculate() {
 
   // Safety defaults
   const d = state.data;
-  if (!d.altura) d.altura = parseInt(document.getElementById('val-altura').textContent) || 175;
-  if (!d.peso)   d.peso   = parseInt(document.getElementById('val-peso').textContent)   || 75;
+  if (!d.altura) d.altura = parseInt(document.getElementById('val-altura').value) || 175;
+  if (!d.peso)   d.peso   = parseInt(document.getElementById('val-peso').value)   || 75;
 
   // Show calculating screen
   state.current = 11;
